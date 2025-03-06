@@ -1,8 +1,8 @@
 package com.example.EmployeePayrollApp.controller;
 
-
+import com.example.EmployeePayrollApp.dto.EmployeePayrollDTO;
 import com.example.EmployeePayrollApp.model.EmployeePayroll;
-import com.example.EmployeePayrollApp.repository.EmployeePayrollRepository;
+import com.example.EmployeePayrollApp.service.EmployeePayrollService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,43 +15,36 @@ import java.util.List;
 public class EmployeePayrollController {
 
     @Autowired
-    private EmployeePayrollRepository repository;
+    private EmployeePayrollService employeePayrollService;
 
-    @GetMapping("/get")
-    public List<EmployeePayroll> getEmployeePayrollData() {
-        return repository.findAll();
+    @GetMapping(value = {"", "/", "/get"})
+    public ResponseEntity<List<EmployeePayroll>> getEmployeePayrollData() {
+        List<EmployeePayroll> employeeList = employeePayrollService.getAllEmployees();
+        return new ResponseEntity<>(employeeList, HttpStatus.OK);
     }
 
     @GetMapping("/get/{empId}")
     public ResponseEntity<EmployeePayroll> getEmployeePayrollData(@PathVariable("empId") int empId) {
-        return repository.findById(empId)
-                .map(emp -> new ResponseEntity<>(emp, HttpStatus.OK))
-                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+        EmployeePayroll employee = employeePayrollService.getEmployeeById(empId);
+        return new ResponseEntity<>(employee, HttpStatus.OK);
     }
 
     @PostMapping("/create")
-    public EmployeePayroll addEmployeePayrollData(@RequestBody EmployeePayroll empPayroll) {
-        return repository.save(empPayroll);
+    public ResponseEntity<EmployeePayroll> addEmployeePayrollData(@RequestBody EmployeePayrollDTO empPayrollDTO) {
+        EmployeePayroll newEmployee = employeePayrollService.addEmployee(empPayrollDTO);
+        return new ResponseEntity<>(newEmployee, HttpStatus.CREATED);
     }
 
     @PutMapping("/update/{empId}")
-    public ResponseEntity<EmployeePayroll> updateEmployeePayrollData(@PathVariable int empId, @RequestBody EmployeePayroll empDetails) {
-        return repository.findById(empId)
-                .map(emp -> {
-                    emp.setName(empDetails.getName());
-                    emp.setSalary(empDetails.getSalary());
-                    return new ResponseEntity<>(repository.save(emp), HttpStatus.OK);
-                })
-                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    public ResponseEntity<EmployeePayroll> updateEmployeePayrollData(
+            @PathVariable("empId") int empId, @RequestBody EmployeePayrollDTO empPayrollDTO) {
+        EmployeePayroll updatedEmployee = employeePayrollService.updateEmployee(empId, empPayrollDTO);
+        return new ResponseEntity<>(updatedEmployee, HttpStatus.OK);
     }
 
     @DeleteMapping("/delete/{empId}")
-    public ResponseEntity<String> deleteEmployeePayrollData(@PathVariable int empId) {
-        if (repository.existsById(empId)) {
-            repository.deleteById(empId);
-            return new ResponseEntity<>("Employee Deleted", HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>("Employee Not Found", HttpStatus.NOT_FOUND);
-        }
+    public ResponseEntity<String> deleteEmployeePayrollData(@PathVariable("empId") int empId) {
+        employeePayrollService.deleteEmployee(empId);
+        return new ResponseEntity<>("Employee deleted successfully", HttpStatus.OK);
     }
 }
