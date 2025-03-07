@@ -2,7 +2,13 @@ package com.example.EmployeePayrollApp.model;
 
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+@Setter
+@Getter
 @Entity
 @Table(name = "employee_payroll")
 public class EmployeePayroll {
@@ -12,7 +18,7 @@ public class EmployeePayroll {
     private String name;
     private long salary;
 
-    // Constructors, Getters, Setters
+    // Constructors
     public EmployeePayroll() {}
 
     public EmployeePayroll(String name, long salary) {
@@ -20,10 +26,4 @@ public class EmployeePayroll {
         this.salary = salary;
     }
 
-    public int getId() { return id; }
-    public void setId(int id) { this.id = id; }
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
-    public long getSalary() { return salary; }
-    public void setSalary(long salary) { this.salary = salary; }
 }
