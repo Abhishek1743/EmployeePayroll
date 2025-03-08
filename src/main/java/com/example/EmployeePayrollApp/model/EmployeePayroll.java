@@ -2,9 +2,7 @@ package com.example.EmployeePayrollApp.model;
 
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Setter
@@ -17,13 +15,15 @@ public class EmployeePayroll {
     private int id;
     private String name;
     private long salary;
+    private String department;
 
     // Constructors
     public EmployeePayroll() {}
 
-    public EmployeePayroll(String name, long salary) {
+    public EmployeePayroll(String name, long salary, String department) {
         this.name = name;
         this.salary = salary;
+        this.department = department;
     }
 
 }

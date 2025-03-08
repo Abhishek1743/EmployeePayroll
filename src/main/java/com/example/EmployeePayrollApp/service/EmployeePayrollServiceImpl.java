@@ -6,46 +6,46 @@ import com.example.EmployeePayrollApp.repository.EmployeePayrollRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class EmployeePayrollServiceImpl implements EmployeePayrollService {
 
     @Autowired
-    private EmployeePayrollRepository repository;
+    EmployeePayrollRepository employeePayrollRepository;
 
     @Override
     public List<EmployeePayroll> getAllEmployees() {
-        return repository.findAll();
+        return employeePayrollRepository.findAll();
     }
 
     @Override
     public EmployeePayroll getEmployeeById(int empId) {
-        return repository.findById(empId)
-                .orElseThrow(() -> new RuntimeException("Employee Not Found"));
+        return employeePayrollRepository.findById(empId)
+                .orElseThrow(() -> new RuntimeException("Employee not found with ID: " + empId));
     }
 
     @Override
-    public EmployeePayroll addEmployee(EmployeePayrollDTO empPayrollDTO) {
-        EmployeePayroll newEmployee = new EmployeePayroll(empPayrollDTO.getName(), empPayrollDTO.getSalary());
-        return repository.save(newEmployee);
+    public EmployeePayroll addEmployee(EmployeePayrollDTO employeePayrollDTO) {
+        EmployeePayroll employee = new EmployeePayroll();
+        employee.setName(employeePayrollDTO.getName());
+        employee.setSalary(employeePayrollDTO.getSalary());
+        employee.setDepartment(employeePayrollDTO.getDepartment()); // Single department
+
+        return employeePayrollRepository.save(employee);
     }
 
     @Override
-    public EmployeePayroll updateEmployee(int empId, EmployeePayrollDTO empPayrollDTO) {
-        Optional<EmployeePayroll> existingEmployee = repository.findById(empId);
-        if (existingEmployee.isPresent()) {
-            EmployeePayroll employee = existingEmployee.get();
-            employee.setName(empPayrollDTO.getName());
-            employee.setSalary(empPayrollDTO.getSalary());
-            return repository.save(employee);
-        } else {
-            throw new RuntimeException("Employee Not Found");
-        }
+    public EmployeePayroll updateEmployee(int empId, EmployeePayrollDTO employeePayrollDTO) {
+        EmployeePayroll existingEmployee = getEmployeeById(empId);
+        existingEmployee.setName(employeePayrollDTO.getName());
+        existingEmployee.setSalary(employeePayrollDTO.getSalary());
+        existingEmployee.setDepartment(employeePayrollDTO.getDepartment()); // Update single department
+
+        return employeePayrollRepository.save(existingEmployee);
     }
 
     @Override
     public void deleteEmployee(int empId) {
-        repository.deleteById(empId);
+        employeePayrollRepository.deleteById(empId);
     }
 }
